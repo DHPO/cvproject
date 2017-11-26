@@ -1,7 +1,6 @@
-#ifndef __EXPECT__
-#define __EXPECT__
 #include <string>
 #include <iostream>
+#include "./expect.h"
 #define ABORT true
 
 void expect(bool expr, std::string errMsg)
@@ -13,5 +12,3 @@ void expect(bool expr, std::string errMsg)
             std::cerr << "[Error] " << errMsg << std::endl;
     }
 }
-
-#endif

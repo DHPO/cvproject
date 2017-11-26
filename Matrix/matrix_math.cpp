@@ -1,5 +1,5 @@
 #include "matrix_math.h"
-#include "../expect.h"
+#include "../expect/expect.h"
 
 bool matEqual(const cv::Mat& a, const cv::Mat& b) {
     if (a.rows != b.rows || a.cols != b.cols || a.channels() != b.channels())
@@ -87,5 +87,25 @@ Mat multiply(const double coefficient, Mat& matrix)
 
 Mat matMul(Mat& left, Mat& right)
 {
-    // TODO
+    int leftRow = left.rows;
+    int leftCol = left.cols * left.channels();
+    int rightRow = right.rows;
+    int rightCol = right.cols * right.channels();
+
+    expect(leftCol == rightRow, "MatMul - size mismatch");
+
+    Mat result(leftRow, rightCol, left.type(), Scalar(0));
+
+    for (int i = 0; i < leftRow; i++) {
+        for (int j = 0; j < rightCol; j++) {
+            double temp = 0;
+            for (int k = 0; k < leftCol; k++) {
+                /* optimize */
+                temp += left.ptr<uchar>(i)[k] * right.ptr<uchar>(k)[j];
+            }
+            result.ptr<uchar>(i)[j] = temp;
+        }
+    }
+
+    return result;
 }
