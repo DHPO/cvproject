@@ -2,22 +2,19 @@ CC = g++
 CFLAGS = -g -std=c++11
 LIBCV = `pkg-config --libs --cflags opencv`
 
-all: matrix
-	$(CC) $(CFLAGS) -o target main.cpp matrix_math.o $(LIBCV)
+all: matrix_conv.o
+	$(CC) $(CFLAGS) -o target main.cpp $^ $(LIBCV)
 
-test_all: matrix_math matrix_map exp
+test_all: matrix expect.o
 	$(CC) $(CFLAGS) -o target ./test/test_all.cpp matrix_math.o $(LIBCV)
 
-test_matrix_math: matrix_math exp
-	$(CC) $(CFLAGS) -o target ./test/test_matrix.cpp matrix_math.o expect.o $(LIBCV)
+test_matrix: $(patsubst ./matrix/%.cpp, %.o, $(wildcard ./matrix/*.cpp)) expect.o
+	$(CC) $(CFLAGS) -o target ./test/test_matrix.cpp $^ $(LIBCV)
 
-matrix_math: exp
-	$(CC) $(CFLAGS) -o matrix_math.o -c ./Matrix/matrix_math.cpp $(LIBCV)
+matrix_%.o: ./matrix/matrix_%.cpp
+	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
 
-matrix_map: exp
-	$(CC) $(CFLAGS) -o matrix_map.o -c ./Matrix/matrix_map.cpp $(LIBCV)
-
-exp: 
+expect.o: 
 	$(CC) $(CFLAGS) -o expect.o -c ./expect/expect.cpp 
 
 clean:

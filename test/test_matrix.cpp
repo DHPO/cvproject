@@ -1,6 +1,6 @@
 #include "testlib.cpp"
-#include "../Matrix/matrix_math.h"
-#include "../Matrix/matrix_map.h"
+#include "../matrix/matrix_math.h"
+#include "../matrix/matrix_map.h"
 
 TEST_CASE("Test math operation of matrix", "[matrix]")
 {
@@ -115,5 +115,31 @@ TEST_CASE("test map operation of matrix", "[matrix]")
             matMap(m1, map), m2
         ));
         CHECK_THROWS(matMap(m3, map));
+    }
+
+    SECTION("test matmap - class")
+    {
+        class BinaryMap: public MatMapper {
+            public:
+                void map(uchar &data){data = data < 128 ? 0: 255;}
+        };
+        BinaryMap map;
+        uchar data1[] = {2, 17, 251, 233};
+        uchar result1[] = {0, 0, 255, 255};
+        uchar data2[] = {2, 17, 251, 233};
+        uchar result2[] = {2, 0, 251, 255};
+        Mat m1(2, 2, CV_8UC1, data1);
+        Mat m2(2, 2, CV_8UC1, result1);
+        Mat m3(2, 2, CV_8UC1, data2);
+        Mat m4(2, 2, CV_8UC1, result2);
+        CHECK(matEqual(
+            map.domap(m1), m2
+        ));
+        /* test start and stride */
+        map.setStart(1);
+        map.setStride(2);
+        CHECK(matEqual(
+            map.domap(m3), m4
+        ));
     }
 }
