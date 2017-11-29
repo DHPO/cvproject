@@ -2,7 +2,7 @@
 #include "../expect/expect.h"
 
 bool matEqual(const cv::Mat& a, const cv::Mat& b) {
-    if (a.rows != b.rows || a.cols != b.cols || a.channels() != b.channels())
+    if (a.rows != b.rows || a.cols != b.cols || a.channels() != b.channels() || a.type() != b.type())
         return false;
     cv::Mat temp;
     cv::bitwise_xor(a,b,temp);   
@@ -12,22 +12,26 @@ bool matEqual(const cv::Mat& a, const cv::Mat& b) {
 Mat add(Mat& matrix1, Mat& matrix2)
 {
     expect(matrix1.rows == matrix2.rows, "Add - #rows not equal");
-    expect(matrix1.cols == matrix2.cols, "Add - #rows not equal");
+    expect(matrix1.cols == matrix2.cols, "Add - #cols not equal");
     expect(matrix1.channels() == matrix2.channels(), "Add - #channels not equal");
 
     int channels = matrix1.channels();
     int rows = matrix1.rows;
-    int cols = matrix1.cols * channels;
+    int cols = matrix1.cols; 
+    int datasize = 1 << ((matrix1.type() % 8) >> 1);
+
+    Mat result(rows, cols, matrix1.type());
 
     for (int i = 0; i < rows; i++) {
-        uchar *pa = matrix1.ptr<uchar>(i);
-        uchar *pb = matrix2.ptr<uchar>(i);
-        for (int j = 0; j < cols; j++) {
-            pa[j] += pb[j]; 
+        auto *pa = matrix1.ptr(i);
+        auto *pb = matrix2.ptr(i);
+        auto *pr = result.ptr(i);
+        for (int j = 0; j < cols * channels * datasize; j++) {
+            pr[j] = pa[j] + pb[j];
         }
     }
 
-    return matrix1;
+    return result;
 }
 
 Mat sub(Mat& matrix1, Mat& matrix2)
@@ -38,12 +42,14 @@ Mat sub(Mat& matrix1, Mat& matrix2)
     
     int channels = matrix1.channels();
     int rows = matrix1.rows;
-    int cols = matrix1.cols * channels;
+    int cols = matrix1.cols;
+    int datasize = 1 << ((matrix1.type() % 8) >> 1);
+    Mat result(rows, cols, matrix1.type());
 
     for (int i = 0; i < rows; i++) {
-        uchar *pa = matrix1.ptr<uchar>(i);
-        uchar *pb = matrix2.ptr<uchar>(i);
-        for (int j = 0; j < cols; j++) {
+        auto *pa = matrix1.ptr(i);
+        auto *pb = matrix2.ptr(i);
+        for (int j = 0; j < cols * channels * datasize; j++) {
             pa[j] -= pb[j]; 
         }
     }
@@ -58,7 +64,7 @@ Mat negative(Mat& matrix)
     int cols = matrix.cols * channels;
 
     for (int i = 0; i < rows; i++) {
-        uchar *pa = matrix.ptr<uchar>(i);
+        auto *pa = matrix.ptr(i);
         for (int j = 0; j < cols; j++) {
             pa[j] = -pa[j];
         }
@@ -75,7 +81,7 @@ Mat multiply(const double coefficient, Mat& matrix)
     int cols = matrix.cols * channels;
 
     for (int i = 0; i < rows; i++) {
-        uchar *pa = matrix.ptr<uchar>(i);
+        auto *pa = matrix.ptr(i);
         for (int j = 0; j < cols; j++) {
             pa[j] *= coefficient;
         }
@@ -101,9 +107,9 @@ Mat matMul(Mat& left, Mat& right)
             double temp = 0;
             for (int k = 0; k < leftCol; k++) {
                 /* optimize */
-                temp += left.ptr<uchar>(i)[k] * right.ptr<uchar>(k)[j];
+                temp += left.ptr(i)[k] * right.ptr(k)[j];
             }
-            result.ptr<uchar>(i)[j] = temp;
+            result.ptr(i)[j] = temp;
         }
     }
 

@@ -11,6 +11,9 @@ Mat& matMap(Mat &matrix, std::vector<T> map);
 template<typename T>
 Mat& matMap(Mat &matrix, T(*map)(T));
 
+/**
+ * 
+ */
 class MatMapper{
     protected:
         int start;

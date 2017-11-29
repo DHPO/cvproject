@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -g -std=c++11
 LIBCV = `pkg-config --libs --cflags opencv`
 
-all: matrix_conv.o
+all: matrix_conv.o expect.o matrix_math.o
 	$(CC) $(CFLAGS) -o target main.cpp $^ $(LIBCV)
 
 test_all: matrix expect.o
