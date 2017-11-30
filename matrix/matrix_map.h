@@ -15,41 +15,27 @@ Mat &matMap(Mat &matrix, T (*map)(T));
  * MatMapper - map element to another through matrix
  * override map method to apply your own one
  */
-template <typename T, int channels = 1>
+template <typename T1, int cn1, typename T2, int cn2>
 class MatMapper
 {
-  protected:
-    int start;
-    int stride;
-
   public:
-    MatMapper(int start = 0, int stride = 1) : start(start), stride(stride){};
     /* To override */
-    virtual Vec<T, channels> map(Vec<T, channels>);
-    void setStart(int start);
-    void setStride(int stride);
+    virtual Vec<T2, cn2> map(Vec<T1, cn1>) = 0;
     /* To invoke */
     Mat domap(const Mat &matrix);
 };
 
-
 template <typename T, int channels = 1>
 class MatOperator
 {
-    protected:
-        int start;
-        int stride;
-    public:
-        MatOperator( int start = 0, int stride = 1) : start(start), stride(stride) {};
-        /* To override */
-        virtual Vec<T, channels> op (Vec<T, channels> d1, Vec<T, channels> d2);
-        void setStart(int start);
-        void setStride(int stride);
-        /* To invoke */
-        Mat doOp(const Mat &matrix1, const Mat &matrix2);
+  public:
+    /* To override */
+    virtual Vec<T, channels> op(Vec<T, channels> d1, Vec<T, channels> d2) = 0;
+    /* To invoke */
+    Mat doOp(const Mat &matrix1, const Mat &matrix2);
 };
 
-    /***************************************/
+/***************************************/
 
 #include "../expect/expect.h"
 
@@ -102,26 +88,25 @@ Mat &matMap(Mat &matrix, T (*map)(T))
     return matrix;
 }
 
-template <typename T, int channels>
-Mat MatMapper<T, channels>::domap(const Mat &matrix)
+template <typename T1, int cn1, typename T2, int cn2>
+Mat MatMapper<T1, cn1, T2, cn2>::domap(const Mat &matrix)
 {
-    expect(stride >= 1, "MatMapper - illegal stride");
-    expect(matrix.channels() == channels, "MatMapper - channels violate");
-    expect(1 << ((matrix.type() % 8) >> 1) == sizeof(T), "MatMapper - type violate");
+    expect(matrix.channels() == cn1, "MatMapper - channels violate");
+    expect(1 << ((matrix.type() % 8) >> 1) == sizeof(T1), "MatMapper - type violate");
 
     int rows = matrix.rows;
     int cols = matrix.cols;
 
-    Mat result = matrix.clone();
+    Mat result(rows, cols, DataType<T2>::type + (cn2 - 1) * 8);
     for (int i = 0; i < rows; i++)
     {
-        const T *pa = matrix.ptr<T>(i);
-        T *pr = result.ptr<T>(i);
-        for (int j = start * channels; j < cols * channels; j += stride * channels)
+        const T1 *pa = matrix.ptr<T1>(i);
+        T2 *pr = result.ptr<T2>(i);
+        for (int j = 0; j < cols; j++)
         {
-            auto temp = map(Vec<T, channels>(pa + j));
-            for (int m = 0; m < channels; m++)
-                pr[j + m] = temp[m];
+            Vec<T2, cn2> temp = map(Vec<T1, cn1>(pa + j * cn1));
+            for (int m = 0; m < cn2; m++)
+                pr[j * cn2 + m] = temp[m];
         }
     }
 
@@ -131,7 +116,7 @@ Mat MatMapper<T, channels>::domap(const Mat &matrix)
 template <typename T, int channels>
 Mat MatOperator<T, channels>::doOp(const Mat &matrix1, const Mat &matrix2)
 {
-    expect(stride >= 1, "MatOperator - illegal stride");
+    //expect(stride >= 1, "MatOperator - illegal stride");
     expect(matrix1.channels() == channels, "MatOperator - channels violate");
     expect(matrix2.channels() == channels, "MatOperator - channels violate");
     expect(1 << ((matrix1.type() % 8) >> 1) == sizeof(T), "MatOperator - type violate");
@@ -148,7 +133,7 @@ Mat MatOperator<T, channels>::doOp(const Mat &matrix1, const Mat &matrix2)
         const T *pa = matrix1.ptr<T>(i);
         const T *pb = matrix2.ptr<T>(i);
         T *pr = result.ptr<T>(i);
-        for (int j = start * channels; j < cols * channels; j += stride * channels)
+        for (int j = 0; j < cols * channels; j += channels)
         {
             auto data1 = Vec<T, channels>(pa + j);
             auto data2 = Vec<T, channels>(pb + j);
@@ -160,39 +145,5 @@ Mat MatOperator<T, channels>::doOp(const Mat &matrix1, const Mat &matrix2)
 
     return result;
 }
-
-template <typename T, int channels>
-void MatMapper<T, channels>::setStart(int start)
-{
-    expect(start >= 0, "MatMapper - illegal start");
-    this->start = start;
-}
-
-template <typename T, int channels>
-void MatMapper<T, channels>::setStride(int stride)
-{
-    expect(stride >= 1, "MatMapper - illegal stride");
-    this->stride = stride;
-}
-
-template <typename T, int channels>
-void MatOperator<T, channels>::setStart(int start)
-{
-    expect(start >= 0, "MatOperator - illegal start");
-    this->start = start;
-}
-
-template <typename T, int channels>
-void MatOperator<T, channels>::setStride(int stride)
-{
-    expect(stride >= 1, "MatOperator - illegal stride");
-    this->stride = stride;
-}
-
-template <typename T, int channels>
-Vec<T, channels> MatMapper<T, channels>::map(Vec<T, channels> data) { return data; }
-
-template <typename T, int channels>
-Vec<T, channels> MatOperator<T, channels>::op(Vec<T, channels> data1, Vec<T, channels> data2) { return data1; }
 
 #endif

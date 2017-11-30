@@ -88,7 +88,7 @@ TEST_CASE("Test math operation of matrix", "[matrix]")
 uchar map(uchar data) { return (data >> 2) << 2; }
 
 template <typename T>
-class BinaryMap : public MatMapper<T, 1>
+class BinaryMap : public MatMapper<T, 1, T, 1>
 {
   public:
     Vec<T, 1> map(Vec<T, 1> data)
@@ -152,14 +152,15 @@ TEST_CASE("test map operation of matrix", "[matrix]")
         CHECK(matEqual(
             map2.domap(m5), m6));
         /* test start and stride */
-        map1.setStart(1);
+        /* discard */
+        /*map1.setStart(1);
         map1.setStride(2);
         map2.setStart(1);
         map2.setStride(2);
         CHECK(matEqual(
             map1.domap(m3), m4));
         CHECK(matEqual(
-            map2.domap(m7), m8));
+            map2.domap(m7), m8));*/
     }
 }
 
