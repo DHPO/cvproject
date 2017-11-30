@@ -91,7 +91,11 @@ template <typename T>
 class BinaryMap : public MatMapper<T, 1>
 {
   public:
-    Vec<T, 1> map(Vec<T, 1> data) { data[0] = data[0] < 128 ? 0 : 255; return data;}
+    Vec<T, 1> map(Vec<T, 1> data)
+    {
+        data[0] = data[0] < 128 ? 0 : 255;
+        return data;
+    }
 };
 
 TEST_CASE("test map operation of matrix", "[matrix]")
@@ -156,5 +160,53 @@ TEST_CASE("test map operation of matrix", "[matrix]")
             map1.domap(m3), m4));
         CHECK(matEqual(
             map2.domap(m7), m8));
+    }
+}
+
+template <typename T, int c>
+class MatAdd : public MatOperator<T, c>
+{
+    Vec<T, c> op(Vec<T, c> d1, Vec<T, c> d2) { return d1 + d2; }
+};
+TEST_CASE("test matoperator", "[matrix]")
+{
+    SECTION("test simple function")
+    {
+        MatAdd<uchar, 1> add;
+        Mat m1(3, 3, CV_8UC1, Scalar(1));
+        Mat m2(3, 3, CV_8UC1, Scalar(1));
+        CHECK(matEqual(add.doOp(m1, m2), Mat(3, 3, CV_8UC1, Scalar(2))));
+    }
+    SECTION("test different channels")
+    {
+        MatAdd<uchar, 3> add;
+        Mat m1(3, 3, CV_8UC3, Scalar(1, 2, 3));
+        Mat m2(3, 3, CV_8UC3, Scalar(1, 2, 3));
+        CHECK(matEqual(add.doOp(m1, m2), Mat(3, 3, CV_8UC3, Scalar(2, 4, 6))));
+    }
+    SECTION("test different data type")
+    {
+        MatAdd<float, 1> add;
+        Mat m1(3, 3, CV_32FC1, Scalar(1.0));
+        Mat m2(3, 3, CV_32FC1, Scalar(1.0));
+        CHECK(matEqual(add.doOp(m1, m2), Mat(3, 3, CV_32FC1, Scalar(2.0))));
+    }
+    SECTION("test error case")
+    {
+        MatAdd<uchar, 1> add;
+        /* different size */
+        Mat m1(3, 3, CV_8UC1, Scalar(1));
+        Mat m2(3, 2, CV_8UC1, Scalar(1));
+        CHECK_THROWS(add.doOp(m1, m2));
+
+        /* different type */
+        Mat m3(3, 3, CV_32FC1, Scalar(1.0));
+        Mat m4(3, 3, CV_8UC1, Scalar(1));
+        CHECK_THROWS(add.doOp(m3, m4));
+
+        /* different channel */
+        Mat m5(3, 3, CV_8UC3, Scalar(1, 2, 3));
+        Mat m6(3, 3, CV_8UC1, Scalar(1));
+        CHECK_THROWS(add.doOp(m5, m6));
     }
 }
