@@ -29,7 +29,7 @@ class MatMapper
     void setStart(int start);
     void setStride(int stride);
     /* To invoke */
-    Mat &domap(Mat &matrix);
+    Mat domap(const Mat &matrix);
 };
 
 
@@ -103,7 +103,7 @@ Mat &matMap(Mat &matrix, T (*map)(T))
 }
 
 template <typename T, int channels>
-Mat &MatMapper<T, channels>::domap(Mat &matrix)
+Mat MatMapper<T, channels>::domap(const Mat &matrix)
 {
     expect(stride >= 1, "MatMapper - illegal stride");
     expect(matrix.channels() == channels, "MatMapper - channels violate");
@@ -112,18 +112,20 @@ Mat &MatMapper<T, channels>::domap(Mat &matrix)
     int rows = matrix.rows;
     int cols = matrix.cols;
 
+    Mat result = matrix.clone();
     for (int i = 0; i < rows; i++)
     {
-        T *pa = matrix.ptr<T>(i);
-        for (int j = start; j < cols * channels; j += stride * channels)
+        const T *pa = matrix.ptr<T>(i);
+        T *pr = result.ptr<T>(i);
+        for (int j = start * channels; j < cols * channels; j += stride * channels)
         {
-            auto temp = map(Vec<T, channels>(pa));
+            auto temp = map(Vec<T, channels>(pa + j));
             for (int m = 0; m < channels; m++)
-                pa[j + m] = temp[m];
+                pr[j + m] = temp[m];
         }
     }
 
-    return matrix;
+    return result;
 }
 
 template <typename T, int channels>
@@ -146,10 +148,10 @@ Mat MatOperator<T, channels>::doOp(const Mat &matrix1, const Mat &matrix2)
         const T *pa = matrix1.ptr<T>(i);
         const T *pb = matrix2.ptr<T>(i);
         T *pr = result.ptr<T>(i);
-        for (int j = start; j < cols * channels; j += stride * channels)
+        for (int j = start * channels; j < cols * channels; j += stride * channels)
         {
-            auto data1 = Vec<T, channels>(pa);
-            auto data2 = Vec<T, channels>(pb);
+            auto data1 = Vec<T, channels>(pa + j);
+            auto data2 = Vec<T, channels>(pb + j);
             auto temp = op(data1, data2);
             for (int m = 0; m < channels; m++)
                 pr[j + m] = temp[m];

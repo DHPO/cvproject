@@ -1,6 +1,7 @@
 #include "./matrix/matrix_conv.h"
 #include "./matrix/matrix_map.h"
 #include "./matrix/matrix_math.h"
+#include <cmath>
 
 short myabs(short data){return data >= 0 ? data: -data;}
 
@@ -24,10 +25,31 @@ int main()
     Mat convimg2 = conv(img, kernel2, MIRROR);
     matMap(convimg2, myabs);
 
-    Mat convimg = add(convimg1, convimg2);
+    class MatDistance: public MatOperator<short, 1>
+    {
+        Vec<short, 1> op(Vec<short, 1> d1, Vec<short, 1> d2)
+        {
+            return Vec<short, 1>(sqrt(d1[0] * d1[0] + d2[0] * d2[0]));
+        }
+    };
+    MatDistance distance;
+
+    class MatAdd: public MatOperator<uchar, 1>
+    {
+        Vec<uchar, 1> op(Vec<uchar, 1> d1, Vec<uchar, 1> d2)
+        {
+            int sum = d1[0] + d2[0];
+            return Vec<uchar, 1>(sum>255?255:sum);
+        }
+    };
+    MatAdd add;
+
+    Mat convimg = distance.doOp(convimg1, convimg2);
     convimg.convertTo(convimg, CV_8UC1, 0.25);
 
-    imshow("img", convimg);
+    Mat out = add.doOp(img, convimg);
+
+    imshow("img", out);
     waitKey(0);
     return 0;
 }
