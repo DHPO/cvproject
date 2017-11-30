@@ -79,15 +79,21 @@ TEST_CASE("Test math operation of matrix", "[matrix]")
         Mat m3(2, 2, CV_8UC1, data3);
         Mat m4(3, 3, CV_8UC1, data4);
         CHECK(matEqual(
-            matMul(m1, m2), m3
-        ));
+            matMul(m1, m2), m3));
         CHECK(matEqual(
-            matMul(m2, m1), m4
-        ));
+            matMul(m2, m1), m4));
     }
 }
 
-uchar map(uchar data){ return (data >> 2) << 2; }
+uchar map(uchar data) { return (data >> 2) << 2; }
+
+template <typename T>
+class BinaryMap : public MatMapper<T, 1>
+{
+  public:
+    Vec<T, 1> map(Vec<T, 1> data) { data[0] = data[0] < 128 ? 0 : 255; return data;}
+};
+
 TEST_CASE("test map operation of matrix", "[matrix]")
 {
     SECTION("test matmap - vector")
@@ -99,8 +105,7 @@ TEST_CASE("test map operation of matrix", "[matrix]")
         Mat m2(2, 2, CV_8UC1, result);
         Mat m3(2, 2, CV_16UC1, data);
         CHECK(matEqual(
-            matMap(m1, map), m2
-        ));
+            matMap(m1, map), m2));
         CHECK_THROWS(matMap(m3, map));
     }
 
@@ -112,34 +117,44 @@ TEST_CASE("test map operation of matrix", "[matrix]")
         Mat m2(2, 2, CV_8UC1, result);
         Mat m3(2, 2, CV_16UC1, data);
         CHECK(matEqual(
-            matMap(m1, map), m2
-        ));
+            matMap(m1, map), m2));
         CHECK_THROWS(matMap(m3, map));
     }
 
     SECTION("test matmap - class")
     {
-        class BinaryMap: public MatMapper {
-            public:
-                void map(uchar &data){data = data < 128 ? 0: 255;}
-        };
-        BinaryMap map;
+        BinaryMap<uchar> map1;
+        BinaryMap<float> map2;
         uchar data1[] = {2, 17, 251, 233};
         uchar result1[] = {0, 0, 255, 255};
         uchar data2[] = {2, 17, 251, 233};
         uchar result2[] = {2, 0, 251, 255};
+        float data3[] = {2, 17, 251, 233};
+        float result3[] = {0, 0, 255, 255};
+        float data4[] = {2, 17, 251, 233};
+        float result4[] = {2, 0, 251, 255};
         Mat m1(2, 2, CV_8UC1, data1);
         Mat m2(2, 2, CV_8UC1, result1);
         Mat m3(2, 2, CV_8UC1, data2);
         Mat m4(2, 2, CV_8UC1, result2);
+        Mat m5(2, 2, CV_32FC1, data3);
+        Mat m6(2, 2, CV_32FC1, result3);
+        Mat m7(2, 2, CV_32FC1, data4);
+        Mat m8(2, 2, CV_32FC1, result4);
         CHECK(matEqual(
-            map.domap(m1), m2
-        ));
+            map1.domap(m1), m2));
+        CHECK_THROWS(matEqual(
+            map2.domap(m1), m2));
+        CHECK(matEqual(
+            map2.domap(m5), m6));
         /* test start and stride */
-        map.setStart(1);
-        map.setStride(2);
+        map1.setStart(1);
+        map1.setStride(2);
+        map2.setStart(1);
+        map2.setStride(2);
         CHECK(matEqual(
-            map.domap(m3), m4
-        ));
+            map1.domap(m3), m4));
+        CHECK(matEqual(
+            map2.domap(m7), m8));
     }
 }
