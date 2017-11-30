@@ -37,8 +37,8 @@ int main()
     {
         Vec<uchar, 3> map(Vec<uchar, 1> data)
         {
-            if (data[0] > 128)
-                return Vec<uchar, 3>(0, 0, data[0]);
+            if (data[0] > 80)
+                return Vec<uchar, 3>(0, 0, 255);
             else
                 return Vec<uchar, 3>(0, 0, 0);
         }
