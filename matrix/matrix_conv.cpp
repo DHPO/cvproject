@@ -125,10 +125,10 @@ Mat conv(const Mat &matrix, const Mat &kernel, PaddingMethod method, int stride)
     else
         matrix_pad = matrix.clone();
 
-    Mat result(matrix_pad.rows - kernel.rows + 1, matrix_pad.cols - kernel.cols + 1, matrix.type() + 3);
+    Mat result(matrix_pad.rows - kernel.rows + 1, matrix_pad.cols - kernel.cols + 1, kernel.type());
     for (int r = 0; r < result.rows; r++)
     {
-        short *ptr = result.ptr<short>(r);
+        float *ptr = result.ptr<float>(r);
         for (int c = 0; c < result.cols; c++)
         {
             for (int i = 0; i < result.channels(); i++)

@@ -32,6 +32,8 @@ Mat kernelUniform(Mat &kernel)
 
     fb::Sum<float, 1> sum;
     MatReducer<float, 1>().doReduce(kernel, sum);
+
+    expect(sum.sum[0] != 0, "kernelUniform - can't uniform kernel whose sum is 0");
     Mat result = fb::Scale<float, 1>(1.0 / sum.sum[0]).domap(kernel);
 
     return result;
