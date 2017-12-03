@@ -211,3 +211,49 @@ TEST_CASE("test matoperator", "[matrix]")
         CHECK_THROWS(add.doOp(m5, m6));
     }
 }
+
+template<typename T, int channels = 1>
+class Sum: public Summary<T, channels>
+{
+    public:
+        Vec<T, channels> sum;
+        void record(Vec<T, channels> data){sum += data;}
+};
+
+TEST_CASE("test MatReducer", "[matrix]")
+{
+    SECTION("test simple function")
+    {
+        Sum<uchar, 1> sum;
+        Mat m1(3, 3, CV_8UC1, Scalar(1));
+        MatReducer<uchar, 1>().doReduce(m1, sum);
+        CHECK(sum.sum[0] == 9);
+    }
+    SECTION("test different channels")
+    {
+        Sum<uchar, 3> sum;
+        Mat m(3, 3, CV_8UC3, Scalar(1, 2, 3));
+        MatReducer<uchar, 3>().doReduce(m, sum);
+        CHECK(sum.sum[0] == 9);
+        CHECK(sum.sum[1] == 18);
+        CHECK(sum.sum[2] == 27);
+    }
+    SECTION("test different types")
+    {
+        Sum<float, 1> sum;
+        Mat m1(3, 3, CV_32FC1, Scalar(1));
+        MatReducer<float, 1>().doReduce(m1, sum);
+        CHECK(sum.sum[0] == 9);
+    }
+    SECTION("test error case")
+    {
+        Sum<uchar, 1> sum;
+        /* different type */
+        Mat m1(3, 3, CV_32FC1, Scalar(1));
+        CHECK_THROWS(MatReducer<uchar, 1>().doReduce(m1, sum));
+
+        /* different channels */
+        Mat m2(3, 3, CV_8UC3, Scalar(1, 2, 3));
+        CHECK_THROWS(MatReducer<uchar, 1>().doReduce(m2, sum));
+    }
+}

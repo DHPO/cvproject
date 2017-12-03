@@ -14,6 +14,9 @@ test_matrix: $(patsubst ./matrix/%.cpp, %.o, $(wildcard ./matrix/*.cpp)) expect.
 matrix_%.o: ./matrix/matrix_%.cpp
 	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
 
+filter_%.o: ./filter/filter_%.cpp
+	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
+	
 expect.o: 
 	$(CC) $(CFLAGS) -o expect.o -c ./expect/expect.cpp 
 

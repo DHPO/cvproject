@@ -35,6 +35,20 @@ class MatOperator
     Mat doOp(const Mat &matrix1, const Mat &matrix2);
 };
 
+template<typename T, int channels = 1>
+class Summary{
+    public:
+        virtual void record(Vec<T, channels> data) = 0;
+};
+
+template <typename T, int channels = 1>
+class MatReducer
+{
+public:
+    //virtual void reduce(Summary& summary, Vec<T, channels> d) = 0;
+    void doReduce(const Mat &matrix, Summary<T, channels> &summary);
+};
+
 /***************************************/
 
 #include "../expect/expect.h"
@@ -144,6 +158,25 @@ Mat MatOperator<T, channels>::doOp(const Mat &matrix1, const Mat &matrix2)
     }
 
     return result;
+}
+
+template<typename T, int channels>
+void MatReducer<T, channels>::doReduce(const Mat &matrix, Summary<T, channels> &summary)
+{
+    expect(matrix.channels() == channels, "MatReducer - channels violate");
+    expect(1 << ((matrix.type() % 8) >> 1) == sizeof(T), "MatReducer - type violate");
+
+    int rows = matrix.rows;
+    int cols = matrix.cols;
+
+    for (int i = 0; i < rows; i++)
+    {
+        const T *pa = matrix.ptr<T>(i);
+        for (int j = 0; j < cols; j++)
+        {
+            summary.record(Vec<T, channels>(pa + j * channels));
+        }
+    }
 }
 
 #endif
