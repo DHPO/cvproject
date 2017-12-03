@@ -1,14 +1,16 @@
 #include "./filter/filter_difference.h"
+#include "./filter/filter_smooth.h"
 #include "./matrix/matrix_map.h"
 
 int main()
 {
-    Mat img = imread("1.png", 0);
+    Mat img = imread("1.png");
     
-    Mat out = LaplacianFilter(2.0).doFilter(img);
-    //Mat out = SobelFilter().doFilter(img);
+    // Mat out = LaplacianFilter(2.0).doFilter(img);
+    // Mat out = SobelFilter().doFilter(img);
+    Mat out = MeanFilter(20).doFilter(img);
 
-    class MinMax: public Summary<float, 1>
+    /*class MinMax: public Summary<float, 1>
     {
         public:
             float min = 0;
@@ -25,7 +27,9 @@ int main()
 
 
     out.convertTo(out, CV_8UC1, 255.0/(minmax.max - minmax.min), - minmax.min/(minmax.max - minmax.min));
+*/
 
+    out.convertTo(out, CV_8UC3);
     imshow("img", out);
     waitKey(0);
     return 0;
