@@ -2,6 +2,7 @@
 #include "./filter/filter_smooth.h"
 #include "./matrix/matrix_map.h"
 #include "./color/color_gray_rgb.h"
+#include "./color/color_histogram.h"
 
 int main()
 {
@@ -10,7 +11,8 @@ int main()
     // Mat out = LaplacianFilter(2.0).doFilter(img);
     // Mat out = SobelFilter().doFilter(img);
     // Mat out = MeanFilter(20).doFilter(img);
-    Mat out = GrayToHeat().doMap(img);
+    // Mat out = GrayToHeat().doMap(img);
+    Mat out = Adjuster(equalize(getHistogram(img))).doMap(img);
 
     /*class MinMax: public Summary<float, 1>
     {
