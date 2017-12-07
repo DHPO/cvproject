@@ -14,6 +14,7 @@ class GrayHistogram: public Summary<uchar, 1>
 };
 
 std::vector<int> getHistogram(const Mat &img);
+std::vector<int> getHistogram(const Mat &img, int channel);
 
 std::vector<uchar> equalize(const std::vector<int> &histogram);
 

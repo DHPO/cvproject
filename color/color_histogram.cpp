@@ -1,5 +1,6 @@
 #include "./color_histogram.h"
 #include "../expect/expect.h"
+#include "./color_colorspace.h"
 
 GrayHistogram::GrayHistogram()
 {
@@ -23,6 +24,17 @@ std::vector<int> getHistogram(const Mat &img)
 
     GrayHistogram histogram;
     MatReducer<uchar, 1>().doReduce(img, histogram);
+
+    return histogram.getHistogram();
+}
+
+std::vector<int> getHistogram(const Mat &img, ConvertMethod channel)
+{
+    expect(img.type() == CV_8UC3, "GetHistogram - invalid image type");
+    Mat temp = RGBToGray<uchar>(channel).doMap(img);
+
+    GrayHistogram histogram;
+    MatReducer<uchar, 1>().doReduce(temp, histogram);
 
     return histogram.getHistogram();
 }

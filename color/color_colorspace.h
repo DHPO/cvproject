@@ -14,11 +14,12 @@ class GrayToRGB : public MatMapper<T, 1, T, 3>
     }
 };
 
+enum ConvertMethod {AVG, RED, GREED, BLUE};
+
 template <typename T>
 class RGBToGray : public MatMapper<T, 3, T, 1>
 {
   protected:
-    enum ConvertMethod {AVG, RED, GREED, BLUE};
     ConvertMethod method;
 
   public:
@@ -42,15 +43,20 @@ class RGBToGray : public MatMapper<T, 3, T, 1>
 class GrayToHeat: public MatMapper<uchar, 1, uchar, 3>
 {
     public:
-        Vec<uchar, 3> map(Vec<uchar, 1> data)
-        {
-            if (data[0] < 128) {
-                return Vec<uchar, 3> (255 - 2 * data[0], 2 * data[0], 0);
-            }
-            else {
-                return Vec<uchar, 3> (0, 2 * data[0], 255 - 2 * data[0]);
-            }
-        }
+        Vec<uchar, 3> map(Vec<uchar, 1> data);
+};
+
+Vec<float, 3> RGBToHSV(Vec<uchar, 3> rgb);
+Vec<uchar, 3> HSVToRGB(Vec<float, 3> hsv);
+
+class RGBToHSVConverter: public MatMapper<uchar, 3, float, 3>
+{
+    Vec<float, 3> map(Vec<uchar, 3> rgb);
+};
+
+class HSVToRGBConverter: public MatMapper<float, 3, uchar, 3>
+{
+    Vec<uchar, 3> map(Vec<float, 3> hsv);
 };
 
 #endif

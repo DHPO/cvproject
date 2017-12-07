@@ -1,18 +1,18 @@
 #include "./filter/filter_difference.h"
 #include "./filter/filter_smooth.h"
 #include "./matrix/matrix_map.h"
-#include "./color/color_gray_rgb.h"
+#include "./color/color_colorspace.h"
 #include "./color/color_histogram.h"
 
 int main()
 {
-    Mat img = imread("1.png", 0);
+    Mat img = imread("1.png");
     
     // Mat out = LaplacianFilter(2.0).doFilter(img);
     // Mat out = SobelFilter().doFilter(img);
     // Mat out = MeanFilter(20).doFilter(img);
     // Mat out = GrayToHeat().doMap(img);
-    Mat out = Adjuster(equalize(getHistogram(img))).doMap(img);
+    Mat out = HSVToRGBConverter().doMap(RGBToHSVConverter().doMap(img));
 
     /*class MinMax: public Summary<float, 1>
     {
