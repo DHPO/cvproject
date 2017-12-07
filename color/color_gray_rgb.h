@@ -39,4 +39,18 @@ class RGBToGray : public MatMapper<T, 3, T, 1>
     }
 };
 
+class GrayToHeat: public MatMapper<uchar, 1, uchar, 3>
+{
+    public:
+        Vec<uchar, 3> map(Vec<uchar, 1> data)
+        {
+            if (data[0] < 128) {
+                return Vec<uchar, 3> (255 - 2 * data[0], 2 * data[0], 0);
+            }
+            else {
+                return Vec<uchar, 3> (0, 2 * data[0], 255 - 2 * data[0]);
+            }
+        }
+};
+
 #endif

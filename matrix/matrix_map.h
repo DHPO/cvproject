@@ -22,7 +22,7 @@ class MatMapper
     /* To override */
     virtual Vec<T2, cn2> map(Vec<T1, cn1>) = 0;
     /* To invoke */
-    Mat domap(const Mat &matrix);
+    Mat doMap(const Mat &matrix);
 };
 
 template <typename T, int channels = 1>
@@ -103,7 +103,7 @@ Mat &matMap(Mat &matrix, T (*map)(T))
 }
 
 template <typename T1, int cn1, typename T2, int cn2>
-Mat MatMapper<T1, cn1, T2, cn2>::domap(const Mat &matrix)
+Mat MatMapper<T1, cn1, T2, cn2>::doMap(const Mat &matrix)
 {
     expect(matrix.channels() == cn1, "MatMapper - channels violate");
     expect(1 << ((matrix.type() % 8) >> 1) == sizeof(T1), "MatMapper - type violate");

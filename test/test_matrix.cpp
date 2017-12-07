@@ -146,11 +146,11 @@ TEST_CASE("test map operation of matrix", "[matrix]")
         Mat m7(2, 2, CV_32FC1, data4);
         Mat m8(2, 2, CV_32FC1, result4);
         CHECK(matEqual(
-            map1.domap(m1), m2));
+            map1.doMap(m1), m2));
         CHECK_THROWS(matEqual(
-            map2.domap(m1), m2));
+            map2.doMap(m1), m2));
         CHECK(matEqual(
-            map2.domap(m5), m6));
+            map2.doMap(m5), m6));
         /* test start and stride */
         /* discard */
         /*map1.setStart(1);
@@ -158,9 +158,9 @@ TEST_CASE("test map operation of matrix", "[matrix]")
         map2.setStart(1);
         map2.setStride(2);
         CHECK(matEqual(
-            map1.domap(m3), m4));
+            map1.doMap(m3), m4));
         CHECK(matEqual(
-            map2.domap(m7), m8));*/
+            map2.doMap(m7), m8));*/
     }
 }
 
