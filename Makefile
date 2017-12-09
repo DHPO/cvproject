@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -g -std=c++11
 LIBCV = `pkg-config --libs --cflags opencv`
 
-all: filter_difference.o filter_smooth.o filter_basic.o matrix_conv.o expect.o matrix_math.o color_histogram.o color_colorspace.o
+all: filter_difference.o filter_smooth.o filter_basic.o matrix_conv.o expect.o matrix_math.o color_histogram.o color_colorspace.o morphology_basic.o
 	$(CC) $(CFLAGS) -o target main.cpp $^ $(LIBCV)
 
 test_all: matrix expect.o
@@ -21,6 +21,9 @@ filter_%.o: ./filter/filter_%.cpp $(patsubst ./matrix/%.cpp, %.o, $(wildcard ./m
 	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
 
 color_%.o: ./color/color_%.cpp $(patsubst ./matrix/%.cpp, %.o, $(wildcard ./matrix/*.cpp)) expect.o
+	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
+
+morphology_%.o: ./morphology/morphology_%.cpp $(patsubst ./matrix/%.cpp, %.o, $(wildcard ./matrix/*.cpp)) expect.o
 	$(CC) $(CFLAGS) -o $@ -c $< $(LIBCV)
 
 expect.o: 

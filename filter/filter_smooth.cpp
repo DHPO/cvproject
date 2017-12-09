@@ -1,6 +1,6 @@
 #include "./filter_smooth.h"
 #include "./filter_basic.h"
-#include "../color/color_gray_rgb.h"
+#include "../color/color_colorspace.h"
 
 GaussianFilter::GaussianFilter(float sigma)
 {
