@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -g -std=c++11
 LIBCV = `pkg-config --libs --cflags opencv`
 
-all: filter_difference.o filter_smooth.o filter_basic.o matrix_conv.o expect.o matrix_math.o color_histogram.o color_colorspace.o morphology_basic.o
+all: filter_difference.o filter_smooth.o filter_basic.o matrix_conv.o expect.o matrix_math.o color_histogram.o color_colorspace.o morphology_basic.o color_interpolate.o
 	$(CC) $(CFLAGS) -o target main.cpp $^ $(LIBCV)
 
 test_all: matrix expect.o

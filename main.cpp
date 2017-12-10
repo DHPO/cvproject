@@ -5,10 +5,11 @@
 #include "./color/color_histogram.h"
 #include "./morphology/morphology_basic.h"
 #include "./matrix/matrix_math.h"
+#include "./color/color_interpolate.h"
 
 int main()
 {
-    Mat img = imread("1.png");
+    Mat img = imread("2.png", 0);
     
     // Mat out = LaplacianFilter(2.0).doFilter(img);
     // Mat out = SobelFilter().doFilter(img);
@@ -17,7 +18,9 @@ int main()
     // Mat out = HSVToRGBConverter().doMap(RGBToHSVConverter().doMap(img));
 
     // Mat out = close(img, Mat(10, 10, CV_16SC1, Scalar(1)));
-    Mat out = MediumFilter(10).doFilter(img);
+    // Mat out = MediumFilter(10).doFilter(img);
+    
+    Mat out = resize(img, Size(540, 1080));
     /*class MatSub: public MatOperator<uchar, 1>
     {
         Vec<uchar, 1> op(Vec<uchar, 1> d1, Vec<uchar, 1> d2)
