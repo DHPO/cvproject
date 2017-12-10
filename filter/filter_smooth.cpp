@@ -60,3 +60,71 @@ Mat MeanFilter::doFilter(const Mat &matrix)
 
     return conv(matrix, kernel, MIRROR);
 }
+
+MediumFilter::MediumFilter(int size)
+{
+    this->size = size;
+}
+
+Mat MediumFilter::medium_1(const Mat &img)
+{
+    expect(img.type() == CV_8UC1, "medium_1 - invalid data type");
+    int rows = img.rows;
+    int cols = img.cols;
+    int rRows = rows - size + 1;
+    int rCols = cols - size + 1;
+
+    Mat result(rRows, rCols, img.type());
+    for (int r = 0; r < rRows; r++) {
+        for (int c = 0; c < rCols; c ++) {
+            vector<float> temp;
+            for (int rr = r; rr < r + size; rr ++) {
+                for (int cc = c; cc < c + size; cc ++) {
+                    temp.push_back(img.at<uchar>(rr, cc));
+                }
+            }
+            sort(temp.begin(), temp.end());
+            result.at<uchar>(r, c) = temp[size * size / 2 + 1];
+        }
+    }
+
+    return result;
+}
+
+Mat MediumFilter::medium_3(const Mat &img)
+{
+    expect(img.type() == CV_8UC3, "medium_1 - invalid data type");
+    int rows = img.rows;
+    int cols = img.cols;
+    int rRows = rows - size + 1;
+    int rCols = cols - size + 1;
+
+    Mat result(rRows, rCols * 3, img.type());
+    for (int r = 0; r < rRows; r++) {
+        for (int c = 0; c < rCols; c ++) {
+            vector<float> tempB, tempG, tempR;
+            for (int rr = r; rr < r + size; rr ++) {
+                for (int cc = c; cc < c + size; cc ++) {
+                    Vec<uchar, 3> color = img.at<Vec<uchar, 3>>(rr, cc);
+                    tempB.push_back(color[0]);
+                    tempG.push_back(color[1]);
+                    tempR.push_back(color[2]);
+                }
+            }
+            sort(tempB.begin(), tempB.end());
+            sort(tempG.begin(), tempG.end());
+            sort(tempR.begin(), tempR.end());
+            result.at<Vec<uchar, 3>>(r, c) = Vec<uchar, 3>(tempB[size * size / 2 + 1], tempG[size * size / 2 + 1], tempR[size * size / 2 + 1]);
+        }
+    }
+
+    return result;
+}
+
+Mat MediumFilter::doFilter(const Mat &img)
+{
+    if (img.channels() == 1)
+        return medium_1(img);
+    else
+        return medium_3(img);
+}

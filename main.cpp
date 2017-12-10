@@ -8,7 +8,7 @@
 
 int main()
 {
-    Mat img = imread("1.png", 0);
+    Mat img = imread("1.png");
     
     // Mat out = LaplacianFilter(2.0).doFilter(img);
     // Mat out = SobelFilter().doFilter(img);
@@ -16,7 +16,8 @@ int main()
     // Mat out = GrayToHeat().doMap(img);
     // Mat out = HSVToRGBConverter().doMap(RGBToHSVConverter().doMap(img));
 
-    Mat out = close(img, Mat(10, 10, CV_16SC1, Scalar(1)));
+    // Mat out = close(img, Mat(10, 10, CV_16SC1, Scalar(1)));
+    Mat out = MediumFilter(10).doFilter(img);
     /*class MatSub: public MatOperator<uchar, 1>
     {
         Vec<uchar, 1> op(Vec<uchar, 1> d1, Vec<uchar, 1> d2)

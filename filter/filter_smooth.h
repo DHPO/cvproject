@@ -20,4 +20,14 @@ class MeanFilter{
         Mat doFilter(const Mat &);
 };
 
+class MediumFilter{
+    protected:
+        int size;
+        Mat medium_1(const Mat &);
+        Mat medium_3(const Mat &);
+    public:
+        MediumFilter(int size);
+        Mat doFilter(const Mat &);
+};
+
 #endif
