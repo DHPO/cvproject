@@ -9,7 +9,7 @@
 
 int main()
 {
-    Mat img = imread("2.png", 0);
+    Mat img = imread("1.png");
     
     // Mat out = LaplacianFilter(2.0).doFilter(img);
     // Mat out = SobelFilter().doFilter(img);
@@ -20,7 +20,20 @@ int main()
     // Mat out = close(img, Mat(10, 10, CV_16SC1, Scalar(1)));
     // Mat out = MediumFilter(10).doFilter(img);
     
-    Mat out = resize(img, Size(540, 1080));
+
+    class Scale : public MatTransformmer<uchar, 3> {
+        Point2f pointMap(Point2i point) override {
+            return Point2f(point.x + point.y * 0.2, point.y);
+        }
+        Point2f pointMapReverse(Point2i point) override {
+            return Point2f(point.x - point.y * 0.2, point.y);
+        }
+        Vec<uchar, 3> interpolate(const Mat& img, Point2f point) override {
+            return bilinear_3(img, point);
+        }
+    };
+
+    Mat out = Scale().doTrans(img);
     /*class MatSub: public MatOperator<uchar, 1>
     {
         Vec<uchar, 1> op(Vec<uchar, 1> d1, Vec<uchar, 1> d2)
