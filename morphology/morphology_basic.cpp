@@ -22,6 +22,8 @@ Mat kernelFlip(const Mat &kernel)
 
 Mat dilate(const Mat &img, const Mat &kernel, Point anchor)
 {
+    expect(kernel.type() == CV_16SC1, "dilate - invalid kernel type");
+
     int halfRows = kernel.rows / 2;
     int halfCols = kernel.cols / 2;
 
@@ -50,6 +52,8 @@ Mat dilate(const Mat &img, const Mat &kernel, Point anchor)
 
 Mat erode(const Mat &img, const Mat &kernel, Point anchor)
 {
+    expect(kernel.type() == CV_16SC1, "erode - invalid kernel type");
+
     int halfRows = kernel.rows / 2;
     int halfCols = kernel.cols / 2;
 
