@@ -152,12 +152,12 @@ Mat close_b(const Mat &img, const Mat &kernel, Point anchor)
     return erode_b(dilate_b(img ,kernel, anchor), kernel, anchor);
 }
 
-Mat open(const Mat &img, const Mat &kernel, Point anchor)
+Mat open_g(const Mat &img, const Mat &kernel, Point anchor)
 {
     return dilate(erode(img, kernel, anchor), kernel, anchor);
 }
 
-Mat close(const Mat &img, const Mat &kernel, Point anchor)
+Mat close_g(const Mat &img, const Mat &kernel, Point anchor)
 {
     return erode(dilate(img ,kernel, anchor), kernel, anchor);
 }
@@ -189,9 +189,9 @@ Mat morphGrad(const Mat &img, const Mat &kernel, Point anchor)
 }
 
 Mat tophat(const Mat &img, const Mat &kernel, Point anchor) {
-    return MatSub().doOp(img, open(img, kernel, anchor));
+    return MatSub().doOp(img, open_g(img, kernel, anchor));
 }
 
 Mat blackhat(const Mat &img, const Mat &kernel, Point anchor) {
-    return MatSub().doOp(close(img, kernel, anchor), img);
+    return MatSub().doOp(close_g(img, kernel, anchor), img);
 }

@@ -13,8 +13,8 @@ Mat erode (const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
 Mat open_b(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
 Mat close_b(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
 
-Mat open(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
-Mat close(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
+Mat open_g(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
+Mat close_g(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
 
 Mat morphGrad_b(const Mat &img, const Mat &kernel, Point anchor = Point(-1, -1));
 
