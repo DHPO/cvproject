@@ -53,6 +53,11 @@ uchar bilinear_1(const Mat &img, Point2f point)
         return 0;
     }
 
+    static int count = 0;
+    if (count < 10)
+        std::cout << point.x << "," << point.y << std::endl;
+    count++;
+
     int x = int(point.x);
     int y = int(point.y);
     float fx = point.x - x;

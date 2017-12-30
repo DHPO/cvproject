@@ -3,7 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
-#include "./color/color_interpolate.h"
+#include "../color/color_interpolate.h"
 using namespace cv;
 
 template <typename T>
